@@ -202,7 +202,9 @@ class GUI extends JFrame implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent ae) {
-
+        if (ae.getSource() == upload) {
+            upload_button u = new upload_button();
+        }
     }
 
     public static void main(String[] args) {
