@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-class GUI extends JFrame {
+class GUI extends JFrame implements ActionListener {
     // all the panels for GUI
     JPanel mainPanel = new JPanel(new BorderLayout());
     JPanel playerPanel = new JPanel(new GridBagLayout());
@@ -185,19 +185,23 @@ class GUI extends JFrame {
 
         mainPanel.add(controlPanel, BorderLayout.SOUTH);
 
-        // upload.addActionListener(this);
-        // playButton.addActionListener(this);
-        // stopButton.addActionListener(this);
-        // nextButton.addActionListener(this);
-        // prevButton.addActionListener(this);
-        // pauseButton.addActionListener(this);
-        // addSongButton.addActionListener(this);
-        // repeatCheckbox.addActionListener(this);
+        upload.addActionListener(this);
+        playButton.addActionListener(this);
+        stopButton.addActionListener(this);
+        nextButton.addActionListener(this);
+        prevButton.addActionListener(this);
+        pauseButton.addActionListener(this);
+        addSongButton.addActionListener(this);
+        repeatCheckbox.addActionListener(this);
 
         mainPanel.setBackground(forPanel);
         playerPanel.setBackground(forPanel);
         controlPanel.setBackground(forPanel);
         playlistPanel.setBackground(forPanel);
+
+    }
+
+    public void actionPerformed(ActionEvent ae) {
 
     }
 
