@@ -101,7 +101,7 @@ public class upload_button extends JFrame implements ActionListener {
 
     }
 
-    public void main(String[] args) {
+    public static void main(String[] args) {
 
         upload_button obj = new upload_button();
         obj.setSize(800, 600);
