@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class upload_button extends JFrame {
+public class upload_button extends JFrame implements ActionListener {
 
     // all the labels
     JLabel title = new JLabel("Title");
@@ -91,6 +91,13 @@ public class upload_button extends JFrame {
 
         add(panel, BorderLayout.CENTER);
         add(upload, BorderLayout.SOUTH);
+
+        upload.addActionListener(this);
+        choose.addActionListener(this);
+
+    }
+
+    public void actionPerformed(ActionEvent ae) {
 
     }
 
