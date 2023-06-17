@@ -3,7 +3,6 @@ package music_app;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-//import music_app.upload_button;
 
 class GUI extends JFrame implements ActionListener {
     // all the panels for GUI
