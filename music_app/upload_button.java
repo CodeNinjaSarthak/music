@@ -3,6 +3,8 @@ package music_app;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.sql.*;
 
 public class upload_button extends JFrame implements ActionListener {
 
@@ -28,6 +30,13 @@ public class upload_button extends JFrame implements ActionListener {
     // Color
     Color forPanel = new Color(102, 102, 102);
     Color forButton = new Color(255, 230, 230);
+
+    // information for database
+    private String url = "jdbc:mysql://localhost:3306/music";
+    private String user = "root";
+    private String password = "sarthak@1226";
+
+    File selectedFile;
 
     upload_button() {
         Font font = new Font("Bradley Hand", Font.BOLD, 20);
@@ -100,7 +109,28 @@ public class upload_button extends JFrame implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent ae) {
-
+        if (ae.getSource() == choose) {
+            FileDialog dialog = new FileDialog((Frame) null, "Select File");
+            dialog.setMode(FileDialog.LOAD);
+            dialog.setVisible(true);
+            if (dialog.getFile() != null) {
+                selectedFile = new File(dialog.getDirectory(), dialog.getFile());
+                String file_name = selectedFile.getName();
+                file_name_label.setText(file_name);
+                // JOptionPane pane2 = new JOptionPane();
+                JOptionPane.showMessageDialog(null, "The file has been succesfully saved");
+            }
+        }
+        if (ae.getSource() == upload) {
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                System.out.println("Driver loaded");
+                Connection con = DriverManager.getConnection(url, user, password);
+                System.out.println("Connected");
+            } catch (Exception ex) {
+                System.out.println(ex.getStackTrace());
+            }
+        }
     }
 
     public static void main(String[] args) {

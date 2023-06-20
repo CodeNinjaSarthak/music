@@ -3,6 +3,7 @@ package music_app;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.*;
 
 class GUI extends JFrame implements ActionListener {
     // all the panels for GUI
@@ -38,6 +39,11 @@ class GUI extends JFrame implements ActionListener {
 
     JList<String> user_fav_song = new JList<>(listmodel);
     JCheckBox repeatCheckbox;
+
+    // information for database
+    private String url = "jdbc:mysql://localhost:3306/music";
+    private String user = "root";
+    private String password = "sarthak@1226";
 
     GUI() {
 
