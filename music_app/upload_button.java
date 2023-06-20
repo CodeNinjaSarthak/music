@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.Files;
 import java.sql.*;
 
 public class upload_button extends JFrame implements ActionListener {
@@ -127,9 +128,30 @@ public class upload_button extends JFrame implements ActionListener {
                 System.out.println("Driver loaded");
                 Connection con = DriverManager.getConnection(url, user, password);
                 System.out.println("Connected");
+
+                byte[] music_data = Files.readAllBytes(selectedFile.toPath());
+
+                String query = String.format(
+                        "INSERT INTO music_table (title, artist, album, genre, year, file) VALUES ('%s', '%s', '%s', '%s', %d, '%s')",
+                        title_field.getText(), artist_field.getText(), album_field.getText(), genre_field.getText(),
+                        Integer.parseInt(year_field.getText()), music_data);
+
+                Statement st = con.createStatement();
+                int rowsAffected = st.executeUpdate(query);
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(null, "File uploaded Successfully");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Failed to upload the file");
+                }
+
+                st.close();
+                con.close();
+                System.out.println("Connection closed successfully");
+
             } catch (Exception ex) {
-                System.out.println(ex.getStackTrace());
+                System.out.println(ex);
             }
+
         }
     }
 
