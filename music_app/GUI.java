@@ -45,46 +45,103 @@ class GUI extends JFrame implements ActionListener {
     private String user = "root";
     private String password = "sarthak@1226";
 
+    private Timer time;
+
     GUI() {
 
         Font font = new Font("Bradley Hand", Font.BOLD, 20);
 
-        playButton.setBackground(forButton);
-        playButton.setOpaque(true);
-        playButton.setForeground(forButton);
+        playButton.setForeground(Color.BLACK);
         playButton.setFont(font);
+        playButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                playButton.setForeground(Color.green);
+                time.restart();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                time.stop();
+                playButton.setForeground(Color.BLACK);
+            }
+        });
 
         stopButton.setBackground(forButton);
-        stopButton.setOpaque(true);
         stopButton.setForeground(forButton);
         stopButton.setFont(font);
+        stopButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                stopButton.setForeground(Color.green);
+                time.restart();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                time.stop();
+                stopButton.setForeground(Color.BLACK);
+            }
+        });
 
         prevButton.setBackground(forButton);
-        prevButton.setOpaque(true);
         prevButton.setForeground(forButton);
         prevButton.setFont(font);
+        prevButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                prevButton.setForeground(Color.green);
+                time.restart();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                time.stop();
+                prevButton.setForeground(Color.BLACK);
+            }
+        });
 
         nextButton.setBackground(forButton);
-        nextButton.setOpaque(true);
         nextButton.setForeground(forButton);
         nextButton.setFont(font);
+        nextButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                nextButton.setForeground(Color.green);
+                time.restart();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                time.stop();
+                nextButton.setForeground(Color.BLACK);
+            }
+        });
 
         pauseButton.setBackground(forButton);
-        pauseButton.setOpaque(true);
         pauseButton.setForeground(forButton);
         pauseButton.setFont(font);
+        pauseButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                pauseButton.setForeground(Color.green);
+                time.restart();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                time.stop();
+                pauseButton.setForeground(Color.BLACK);
+            }
+        });
 
         titleLabel.setForeground(forButton);
-        titleLabel.setOpaque(true);
         titleLabel.setFont(font);
+
         artistLabel.setForeground(forButton);
-        artistLabel.setOpaque(true);
         artistLabel.setFont(font);
-        albumLabel.setForeground(forButton);
-        albumLabel.setOpaque(true);
-        albumLabel.setFont(font);
+
         timeLabel.setForeground(forButton);
-        timeLabel.setOpaque(true);
         timeLabel.setFont(font);
 
         addSongButton.setFont(font);
@@ -215,6 +272,7 @@ class GUI extends JFrame implements ActionListener {
             u.setVisible(true);
             u.setSize(300, 400);
         }
+
     }
 
     public static void main(String[] args) {
