@@ -8,3 +8,8 @@ Features
 Browse and search for songs in the music library.
 Create and manage playlists.
 Play, pause, skip, and control playback of songs.
+
+Libraries used :-
+
+1. Mysql connector
+2. JLayer
