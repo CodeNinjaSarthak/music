@@ -27,6 +27,8 @@ class GUI extends JFrame implements ActionListener {
 
     // Textfield for search box
     JLabel artistname = new JLabel();
+    JLabel songdisplay = new JLabel();
+    JLabel albumname = new JLabel();
 
     // all the button for the GUI
     JButton playButton = new JButton("Play");
@@ -53,6 +55,7 @@ class GUI extends JFrame implements ActionListener {
     private String password = "sarthak@1226";
 
     private InputStream audiofiledata;
+    private Player player;
     private String selectedsong;
     private String artist;
     private String album;
@@ -177,16 +180,28 @@ class GUI extends JFrame implements ActionListener {
 
         // timeLabel.setForeground(Color.GRAY);
         timeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        c.gridx = 2;
-        c.gridy = 2;
+        c.gridx = 1;
+        c.gridy = 4;
         c.gridwidth = 1;
         playerPanel.add(timeLabel, c);
 
         artistname.setPreferredSize(new Dimension(200, 30));
         c.gridx = 3;
-        c.gridy = 0;
+        c.gridy = 1;
         c.gridwidth = 1;
         playerPanel.add(artistname, c);
+
+        songdisplay.setPreferredSize(new Dimension(200, 30));
+        c.gridx = 3;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        playerPanel.add(songdisplay, c);
+
+        albumname.setPreferredSize(new Dimension(200, 30));
+        c.gridx = 3;
+        c.gridy = 2;
+        c.gridwidth = 1;
+        playerPanel.add(albumname, c);
 
         playButton.setPreferredSize(new Dimension(100, 30));
 
@@ -317,7 +332,13 @@ class GUI extends JFrame implements ActionListener {
                 album = rs.getString("album");
                 genre = rs.getString("genre");
                 year = rs.getInt("year");
+                Blob audioBlob = rs.getBlob("file");
+                if (audioBlob != null) {
+                    audiofiledata = audioBlob.getBinaryStream();
+                }
                 artistname.setText(artist);
+                albumname.setText(album);
+                songdisplay.setText(selectedsong);
                 System.out.println("Artist: " + artist);
                 System.out.println("Album: " + album);
                 System.out.println("Genre: " + genre);
@@ -339,12 +360,24 @@ class GUI extends JFrame implements ActionListener {
             u.setSize(300, 400);
         }
         if (ae.getSource() == playButton) {
-            try {
-                Player player = new Player(audiofiledata);
-                player.play();
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
+            GUI musicPlayer = new GUI();
+            musicPlayer.play(audiofiledata);
+
+        }
+    }
+
+    public void play(InputStream audiofiledata) {
+        try {
+            player = new Player(audiofiledata);
+            player.play();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public void stop() {
+        if (player != null) {
+            player.close();
         }
     }
 

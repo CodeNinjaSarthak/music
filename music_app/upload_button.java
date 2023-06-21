@@ -140,6 +140,7 @@ public class upload_button extends JFrame implements ActionListener {
                 int rowsAffected = st.executeUpdate(query);
                 if (rowsAffected > 0) {
                     JOptionPane.showMessageDialog(null, "File uploaded Successfully");
+                    dispose();
                 } else {
                     JOptionPane.showMessageDialog(null, "Failed to upload the file");
                 }
