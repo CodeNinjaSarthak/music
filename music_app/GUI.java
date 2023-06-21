@@ -1,9 +1,16 @@
 package music_app;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
 
 class GUI extends JFrame implements ActionListener {
     // all the panels for GUI
@@ -19,7 +26,7 @@ class GUI extends JFrame implements ActionListener {
     JLabel timeLabel = new JLabel("0:0");
 
     // Textfield for search box
-    JTextField searchField = new JTextField();
+    JLabel artistname = new JLabel();
 
     // all the button for the GUI
     JButton playButton = new JButton("Play");
@@ -44,6 +51,13 @@ class GUI extends JFrame implements ActionListener {
     private String url = "jdbc:mysql://localhost:3306/music";
     private String user = "root";
     private String password = "sarthak@1226";
+
+    private InputStream audiofiledata;
+    private String selectedsong;
+    private String artist;
+    private String album;
+    private String genre;
+    private int year;
 
     GUI() {
 
@@ -168,16 +182,16 @@ class GUI extends JFrame implements ActionListener {
         c.gridwidth = 1;
         playerPanel.add(timeLabel, c);
 
-        searchField.setPreferredSize(new Dimension(200, 30));
+        artistname.setPreferredSize(new Dimension(200, 30));
         c.gridx = 3;
         c.gridy = 0;
         c.gridwidth = 1;
-        playerPanel.add(searchField, c);
+        playerPanel.add(artistname, c);
 
         playButton.setPreferredSize(new Dimension(100, 30));
 
-        c.gridx = 3;
-        c.gridy = 1;
+        c.gridx = 4;
+        c.gridy = 0;
         c.gridwidth = 1;
         playerPanel.add(playButton, c);
 
@@ -223,22 +237,37 @@ class GUI extends JFrame implements ActionListener {
             Connection con = DriverManager.getConnection(url, user, password);
             System.out.println("Connected");
             Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from music_table");
+            ResultSet rs = st.executeQuery("SELECT * FROM music_table");
+
             while (rs.next()) {
                 String songname = rs.getString("title");
                 listmodel.addElement(songname);
             }
+
             rs.close();
             st.close();
             con.close();
         } catch (Exception ex) {
-            System.out.println("The error is in the extracting song from the database " + ex.getMessage());
+            System.out.println("Error while extracting song from the database: " + ex.getMessage());
         }
 
         playlistLabel.setFont(new Font("Bradley Hand", Font.BOLD, 18));
         playlistPanel.add(playlistLabel, BorderLayout.NORTH);
 
         song_name.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // block of code for extracting the song title that was clicked on the Jlist -->
+        song_name.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    selectedsong = song_name.getSelectedValue();
+                    System.out.println(selectedsong);
+                    extracting_details(selectedsong);
+                }
+            }
+        });
+
         JScrollPane playlistScrollPane = new JScrollPane(song_name);
         playlistScrollPane.setPreferredSize(new Dimension(200, 200));
         playlistPanel.add(playlistScrollPane, BorderLayout.CENTER);
@@ -274,13 +303,49 @@ class GUI extends JFrame implements ActionListener {
 
     }
 
+    public void extracting_details(String selectedsong) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("Driver Loaded");
+            Connection con = DriverManager.getConnection(url, user, password);
+            System.out.println("Connected");
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM music_table WHERE title = '" + selectedsong + "'");
+
+            if (rs.next()) {
+                artist = rs.getString("artist");
+                album = rs.getString("album");
+                genre = rs.getString("genre");
+                year = rs.getInt("year");
+                artistname.setText(artist);
+                System.out.println("Artist: " + artist);
+                System.out.println("Album: " + album);
+                System.out.println("Genre: " + genre);
+                System.out.println("Year: " + year);
+            }
+
+            rs.close();
+            st.close();
+            con.close();
+        } catch (Exception ex) {
+            System.out.println("Error while extracting details from the database: " + ex.getMessage());
+        }
+    }
+
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource() == upload) {
             upload_button u = new upload_button();
             u.setVisible(true);
             u.setSize(300, 400);
         }
-
+        if (ae.getSource() == playButton) {
+            try {
+                Player player = new Player(audiofiledata);
+                player.play();
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
     }
 
     public static void main(String[] args) {
