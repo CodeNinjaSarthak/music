@@ -45,8 +45,6 @@ class GUI extends JFrame implements ActionListener {
     private String user = "root";
     private String password = "sarthak@1226";
 
-    private Timer time;
-
     GUI() {
 
         Font font = new Font("Bradley Hand", Font.BOLD, 20);
@@ -57,12 +55,10 @@ class GUI extends JFrame implements ActionListener {
             @Override
             public void mouseEntered(MouseEvent e) {
                 playButton.setForeground(Color.green);
-                time.restart();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                time.stop();
                 playButton.setForeground(Color.BLACK);
             }
         });
@@ -74,12 +70,10 @@ class GUI extends JFrame implements ActionListener {
             @Override
             public void mouseEntered(MouseEvent e) {
                 stopButton.setForeground(Color.green);
-                time.restart();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                time.stop();
                 stopButton.setForeground(Color.BLACK);
             }
         });
@@ -91,12 +85,10 @@ class GUI extends JFrame implements ActionListener {
             @Override
             public void mouseEntered(MouseEvent e) {
                 prevButton.setForeground(Color.green);
-                time.restart();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                time.stop();
                 prevButton.setForeground(Color.BLACK);
             }
         });
@@ -108,12 +100,11 @@ class GUI extends JFrame implements ActionListener {
             @Override
             public void mouseEntered(MouseEvent e) {
                 nextButton.setForeground(Color.green);
-                time.restart();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                time.stop();
+
                 nextButton.setForeground(Color.BLACK);
             }
         });
@@ -125,12 +116,10 @@ class GUI extends JFrame implements ActionListener {
             @Override
             public void mouseEntered(MouseEvent e) {
                 pauseButton.setForeground(Color.green);
-                time.restart();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                time.stop();
                 pauseButton.setForeground(Color.BLACK);
             }
         });
@@ -226,6 +215,25 @@ class GUI extends JFrame implements ActionListener {
         playlistPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
 
         JLabel playlistLabel = new JLabel("Playlist");
+
+        // Adding song from the database to the GUI
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("Driver Loaded");
+            Connection con = DriverManager.getConnection(url, user, password);
+            System.out.println("Connected");
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("Select * from music_table");
+            while (rs.next()) {
+                String songname = rs.getString("title");
+                listmodel.addElement(songname);
+            }
+            rs.close();
+            st.close();
+            con.close();
+        } catch (Exception ex) {
+            System.out.println("The error is in the extracting song from the database " + ex.getMessage());
+        }
 
         playlistLabel.setFont(new Font("Bradley Hand", Font.BOLD, 18));
         playlistPanel.add(playlistLabel, BorderLayout.NORTH);
