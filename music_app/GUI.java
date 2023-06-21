@@ -6,6 +6,7 @@ import javax.swing.event.ListSelectionListener;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
@@ -334,7 +335,8 @@ class GUI extends JFrame implements ActionListener {
                 year = rs.getInt("year");
                 Blob audioBlob = rs.getBlob("file");
                 if (audioBlob != null) {
-                    audiofiledata = audioBlob.getBinaryStream();
+                    byte[] audioData = audioBlob.getBytes(1, (int) audioBlob.length());
+                    audiofiledata = new ByteArrayInputStream(audioData);
                 }
                 artistname.setText(artist);
                 albumname.setText(album);
@@ -343,6 +345,7 @@ class GUI extends JFrame implements ActionListener {
                 System.out.println("Album: " + album);
                 System.out.println("Genre: " + genre);
                 System.out.println("Year: " + year);
+                System.out.println("file " + audiofiledata);
             }
 
             rs.close();
@@ -360,9 +363,14 @@ class GUI extends JFrame implements ActionListener {
             u.setSize(300, 400);
         }
         if (ae.getSource() == playButton) {
-            GUI musicPlayer = new GUI();
-            musicPlayer.play(audiofiledata);
-
+            if (audiofiledata != null) {
+                play(audiofiledata);
+            } else {
+                System.out.println("No audio file selected.");
+            }
+        }
+        if (ae.getSource() == nextButton) {
+            System.out.println("The button is working properly");
         }
     }
 
@@ -370,8 +378,8 @@ class GUI extends JFrame implements ActionListener {
         try {
             player = new Player(audiofiledata);
             player.play();
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+        } catch (JavaLayerException ex) {
+            System.out.println("Error while playing the audio: " + ex.getMessage());
         }
     }
 
