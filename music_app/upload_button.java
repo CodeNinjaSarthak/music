@@ -116,10 +116,10 @@ public class upload_button extends JFrame implements ActionListener {
             dialog.setVisible(true);
             if (dialog.getFile() != null) {
                 selectedFile = new File(dialog.getDirectory(), dialog.getFile());
-                String file_name = selectedFile.getName();
-                file_name_label.setText(file_name);
+                String file_path = selectedFile.getAbsolutePath(); // Get the absolute file path
+                file_name_label.setText(file_path);
                 // JOptionPane pane2 = new JOptionPane();
-                JOptionPane.showMessageDialog(null, "The file has been succesfully saved");
+                JOptionPane.showMessageDialog(null, "The file has been successfully selected");
             }
         }
         if (ae.getSource() == upload) {
@@ -129,12 +129,10 @@ public class upload_button extends JFrame implements ActionListener {
                 Connection con = DriverManager.getConnection(url, user, password);
                 System.out.println("Connected");
 
-                byte[] music_data = Files.readAllBytes(selectedFile.toPath());
-
                 String query = String.format(
                         "INSERT INTO music_table (title, artist, album, genre, year, file) VALUES ('%s', '%s', '%s', '%s', %d, '%s')",
                         title_field.getText(), artist_field.getText(), album_field.getText(), genre_field.getText(),
-                        Integer.parseInt(year_field.getText()), music_data);
+                        Integer.parseInt(year_field.getText()), selectedFile.getAbsolutePath());
 
                 Statement st = con.createStatement();
                 int rowsAffected = st.executeUpdate(query);
@@ -152,7 +150,6 @@ public class upload_button extends JFrame implements ActionListener {
             } catch (Exception ex) {
                 System.out.println(ex);
             }
-
         }
     }
 
