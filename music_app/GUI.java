@@ -3,15 +3,10 @@ package music_app;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
+import javazoom.jl.player.Player;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.*;
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.Player;
 
 class GUI extends JFrame implements ActionListener {
     // all the panels for GUI
@@ -55,13 +50,13 @@ class GUI extends JFrame implements ActionListener {
     private String user = "root";
     private String password = "sarthak@1226";
 
-    private InputStream audiofiledata;
     private Player player;
     private String selectedsong;
     private String artist;
     private String album;
     private String genre;
     private int year;
+    private String audioPath;
 
     GUI() {
 
@@ -333,11 +328,7 @@ class GUI extends JFrame implements ActionListener {
                 album = rs.getString("album");
                 genre = rs.getString("genre");
                 year = rs.getInt("year");
-                Blob audioBlob = rs.getBlob("file");
-                if (audioBlob != null) {
-                    byte[] audioData = audioBlob.getBytes(1, (int) audioBlob.length());
-                    audiofiledata = new ByteArrayInputStream(audioData);
-                }
+                audioPath = rs.getString("file");
                 artistname.setText(artist);
                 albumname.setText(album);
                 songdisplay.setText(selectedsong);
@@ -345,7 +336,7 @@ class GUI extends JFrame implements ActionListener {
                 System.out.println("Album: " + album);
                 System.out.println("Genre: " + genre);
                 System.out.println("Year: " + year);
-                System.out.println("file " + audiofiledata);
+                System.out.println("Path: " + audioPath);
             }
 
             rs.close();
@@ -363,23 +354,23 @@ class GUI extends JFrame implements ActionListener {
             u.setSize(300, 400);
         }
         if (ae.getSource() == playButton) {
-            if (audiofiledata != null) {
-                play(audiofiledata);
-            } else {
-                System.out.println("No audio file selected.");
-            }
+            System.out.println("Playbutton working properly");
+            extracting_details(selectedsong);
+            System.out.println("audioPath: " + audioPath);
+            play(audioPath);
         }
         if (ae.getSource() == nextButton) {
             System.out.println("The button is working properly");
         }
     }
 
-    public void play(InputStream audiofiledata) {
+    public void play(String audioPath) {
         try {
-            player = new Player(audiofiledata);
+            this.audioPath = audioPath;
+            player = new Player(getClass().getResourceAsStream(audioPath));
             player.play();
-        } catch (JavaLayerException ex) {
-            System.out.println("Error while playing the audio: " + ex.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
