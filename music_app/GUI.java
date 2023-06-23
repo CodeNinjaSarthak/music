@@ -6,6 +6,8 @@ import javax.swing.event.ListSelectionListener;
 import javazoom.jl.player.Player;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.sql.*;
 
 class GUI extends JFrame implements ActionListener {
@@ -364,10 +366,20 @@ class GUI extends JFrame implements ActionListener {
         }
     }
 
+    // public void play(String audioPath) {
+    // try {
+    // this.audioPath = audioPath;
+    // player = new Player(getClass().getResourceAsStream(audioPath));
+    // player.play();
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // }
+    // }
     public void play(String audioPath) {
         try {
-            this.audioPath = audioPath;
-            player = new Player(getClass().getResourceAsStream(audioPath));
+            FileInputStream fis = new FileInputStream(audioPath);
+            BufferedInputStream bis = new BufferedInputStream(fis);
+            Player player = new Player(bis);
             player.play();
         } catch (Exception e) {
             e.printStackTrace();
