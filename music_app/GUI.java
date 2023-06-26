@@ -3,9 +3,6 @@ package music_app;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.AudioFileFormat;
-import javazoom.jl.player.Player;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 
 import java.awt.*;
@@ -444,7 +441,7 @@ class GUI extends JFrame implements ActionListener {
             newpostion = totalLength - pausedPos - 20000;
             fis.skip(newpostion);
             System.out.println("Temp " + newpostion);
-            player = new AdvancedPlayer(bis); // Create the Player instance after skipping bytes
+            player = new AdvancedPlayer(bis);
 
             SwingWorker<Void, Void> playerThread = new SwingWorker<Void, Void>() {
                 @Override
