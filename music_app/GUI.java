@@ -3,11 +3,17 @@ package music_app;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.AudioFileFormat;
 import javazoom.jl.player.Player;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
 
 class GUI extends JFrame implements ActionListener {
@@ -31,7 +37,7 @@ class GUI extends JFrame implements ActionListener {
     // all the button for the GUI
     JButton playButton = new JButton("Play");
     JButton pauseButton = new JButton("Pause");
-    JButton stopButton = new JButton("Stop");
+    JButton resumeButton = new JButton("Resume");
     JButton prevButton = new JButton("Previous");
     JButton nextButton = new JButton("Next");
     JButton upload = new JButton("Upload");
@@ -52,13 +58,21 @@ class GUI extends JFrame implements ActionListener {
     private String user = "root";
     private String password = "sarthak@1226";
 
-    private Player player;
+    private AdvancedPlayer player;
     private String selectedsong;
     private String artist;
     private String album;
     private String genre;
     private int year;
     private String audioPath;
+
+    // for pausing and playing of the song
+    private boolean paused = false;
+    private long pausedPos = 0;
+    private long totalLength = 0;
+    private FileInputStream fis;
+    private BufferedInputStream bis;
+    private long newpostion;
 
     GUI() {
 
@@ -78,18 +92,18 @@ class GUI extends JFrame implements ActionListener {
             }
         });
 
-        stopButton.setBackground(forButton);
-        stopButton.setForeground(forButton);
-        stopButton.setFont(font);
-        stopButton.addMouseListener(new MouseAdapter() {
+        resumeButton.setBackground(forButton);
+        resumeButton.setForeground(forButton);
+        resumeButton.setFont(font);
+        resumeButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                stopButton.setForeground(Color.green);
+                resumeButton.setForeground(Color.green);
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                stopButton.setForeground(Color.BLACK);
+                resumeButton.setForeground(Color.BLACK);
             }
         });
 
@@ -214,11 +228,11 @@ class GUI extends JFrame implements ActionListener {
         c.gridwidth = 1;
         playerPanel.add(pauseButton, c);
 
-        stopButton.setPreferredSize(new Dimension(100, 30));
+        resumeButton.setPreferredSize(new Dimension(100, 30));
         c.gridx = 5;
         c.gridy = 1;
         c.gridwidth = 1;
-        playerPanel.add(stopButton, c);
+        playerPanel.add(resumeButton, c);
         addSongButton.setPreferredSize(new Dimension(100, 30));
         c.gridx = 6;
         c.gridy = 1;
@@ -302,7 +316,7 @@ class GUI extends JFrame implements ActionListener {
 
         upload.addActionListener(this);
         playButton.addActionListener(this);
-        stopButton.addActionListener(this);
+        resumeButton.addActionListener(this);
         nextButton.addActionListener(this);
         prevButton.addActionListener(this);
         pauseButton.addActionListener(this);
@@ -334,11 +348,6 @@ class GUI extends JFrame implements ActionListener {
                 artistname.setText(artist);
                 albumname.setText(album);
                 songdisplay.setText(selectedsong);
-                System.out.println("Artist: " + artist);
-                System.out.println("Album: " + album);
-                System.out.println("Genre: " + genre);
-                System.out.println("Year: " + year);
-                System.out.println("Path: " + audioPath);
             }
 
             rs.close();
@@ -364,17 +373,25 @@ class GUI extends JFrame implements ActionListener {
         if (ae.getSource() == nextButton) {
             System.out.println("The button is working properly");
         }
+        if (ae.getSource() == pauseButton) {
+            paused = true;
+            pause();
+        }
+        if (ae.getSource() == resumeButton) {
+            resume();
+        }
     }
 
     public void play(String audioPath) {
         try {
             stop();
+            fis = new FileInputStream(audioPath);
+            bis = new BufferedInputStream(fis);
+            player = new AdvancedPlayer(bis);
             SwingWorker<Void, Void> playerThread = new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    FileInputStream fis = new FileInputStream(audioPath);
-                    BufferedInputStream bis = new BufferedInputStream(fis);
-                    player = new Player(bis);
+
                     player.play();
                     return null;
                 }
@@ -389,6 +406,65 @@ class GUI extends JFrame implements ActionListener {
         if (player != null) {
             player.close();
             player = null;
+        }
+        if (fis != null) {
+            try {
+                fis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (bis != null) {
+            try {
+                bis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void pause() {
+        if (player != null) {
+            try {
+                pausedPos = fis.available();
+                player.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public void resume() {
+        try {
+            fis = new FileInputStream(audioPath);
+            bis = new BufferedInputStream(fis);
+            sizemethod(); // Calculate the total length of the audio file
+            System.out.println("total " + totalLength);
+            System.out.println("pausedPos " + pausedPos);
+            newpostion = totalLength - pausedPos - 20000;
+            fis.skip(newpostion);
+            System.out.println("Temp " + newpostion);
+            player = new AdvancedPlayer(bis); // Create the Player instance after skipping bytes
+
+            SwingWorker<Void, Void> playerThread = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    player.play();
+                    return null;
+                }
+            };
+            playerThread.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sizemethod() {
+        try {
+            File audioFile = new File(audioPath);
+            totalLength = audioFile.length();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
