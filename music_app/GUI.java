@@ -368,12 +368,19 @@ class GUI extends JFrame implements ActionListener {
 
     public void play(String audioPath) {
         try {
-            FileInputStream fis = new FileInputStream(audioPath);
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            Player player = new Player(bis);
-            player.play();
-        } catch (Exception e) {
-            e.printStackTrace();
+            SwingWorker<Void, Void> playerThread = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    FileInputStream fis = new FileInputStream(audioPath);
+                    BufferedInputStream bis = new BufferedInputStream(fis);
+                    Player player = new Player(bis);
+                    player.play();
+                    return null;
+                }
+            };
+            playerThread.execute();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
