@@ -46,8 +46,9 @@ class GUI extends JFrame implements ActionListener {
 
     DefaultListModel<String> listmodel = new DefaultListModel<>();
     JList<String> song_name = new JList<>(listmodel);
-
-    JList<String> user_fav_song = new JList<>(listmodel);
+    // JList<String> user_fav_song = new JList<>(listmodel);
+    DefaultListModel<String> user_fav_model = new DefaultListModel<>();
+    JList<String> user_fav_song = new JList<>(user_fav_model);
     JCheckBox repeatCheckbox;
 
     // information for database
@@ -296,7 +297,39 @@ class GUI extends JFrame implements ActionListener {
         playlistScrollPane.setPreferredSize(new Dimension(200, 200));
         playlistPanel.add(playlistScrollPane, BorderLayout.CENTER);
 
+        // for userplaylist
+        // Adding song from the database to userfav playlist
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("Driver Loaded");
+            Connection con = DriverManager.getConnection(url, user, password);
+            System.out.println("Connected");
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM usersong");
+
+            while (rs.next()) {
+                String songname = rs.getString("title");
+                user_fav_model.addElement(songname);
+            }
+
+            rs.close();
+            st.close();
+            con.close();
+        } catch (Exception ex) {
+            System.out.println("Error while extracting song from the database: " + ex.getMessage());
+        }
         user_fav_song.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        user_fav_song.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    selectedsong = user_fav_song.getSelectedValue();
+                    System.out.println(selectedsong);
+                    extracting_details(selectedsong);
+                }
+            }
+        });
+
         JScrollPane userplaylistscroll = new JScrollPane(user_fav_song);
         userplaylistscroll.setPreferredSize(new Dimension(200, 200));
         playlistPanel.add(userplaylistscroll, BorderLayout.CENTER);
@@ -376,6 +409,35 @@ class GUI extends JFrame implements ActionListener {
         }
         if (ae.getSource() == resumeButton) {
             resume();
+        }
+        if (ae.getSource() == addSongButton) {
+            // String selectedSong = song_name.getSelectedValue();
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                System.out.println("Driver loaded");
+                Connection con = DriverManager.getConnection(url, user, password);
+                System.out.println("Connected");
+
+                String query = String.format(
+                        "INSERT INTO usersong (title, artist, album, genre, year, file) VALUES ('%s', '%s', '%s', '%s', %d, '%s')",
+                        selectedsong, artist, album, genre, year, audioPath);
+
+                Statement st = con.createStatement();
+                int rowsAffected = st.executeUpdate(query);
+                // if (rowsAffected > 0) {
+                // JOptionPane.showMessageDialog(null, "File uploaded Successfully");
+                // dispose();
+                // } else {
+                // JOptionPane.showMessageDialog(null, "Failed to upload the file");
+                // }
+
+                st.close();
+                con.close();
+                System.out.println("Connection closed successfully");
+
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
         }
     }
 
