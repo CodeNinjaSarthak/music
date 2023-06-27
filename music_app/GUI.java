@@ -438,6 +438,7 @@ class GUI extends JFrame implements ActionListener {
             } catch (Exception ex) {
                 System.out.println(ex);
             }
+            reloadPlaylistPanel();
         }
     }
 
@@ -500,7 +501,7 @@ class GUI extends JFrame implements ActionListener {
             sizemethod(); // Calculate the total length of the audio file
             System.out.println("total " + totalLength);
             System.out.println("pausedPos " + pausedPos);
-            newpostion = totalLength - pausedPos - 20000;
+            newpostion = totalLength - pausedPos - 20000; // for making the song play from the correct paused position
             fis.skip(newpostion);
             System.out.println("Temp " + newpostion);
             player = new AdvancedPlayer(bis);
@@ -525,6 +526,36 @@ class GUI extends JFrame implements ActionListener {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public void reloadPlaylistPanel() {
+        // Clear the existing song names from the list model
+        user_fav_model.clear();
+
+        // Retrieve the updated song names from the database
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("Driver Loaded");
+            Connection con = DriverManager.getConnection(url, user, password);
+            System.out.println("Connected");
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM usersong");
+
+            while (rs.next()) {
+                String songname = rs.getString("title");
+                user_fav_model.addElement(songname);
+            }
+
+            rs.close();
+            st.close();
+            con.close();
+        } catch (Exception ex) {
+            System.out.println("Error while extracting song from the database: " + ex.getMessage());
+        }
+
+        // Repaint the playlistPanel to reflect the updated song names
+        playlistPanel.revalidate();
+        playlistPanel.repaint();
     }
 
     public static void main(String[] args) {
