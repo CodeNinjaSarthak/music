@@ -24,7 +24,7 @@ class GUI extends JFrame implements ActionListener {
     JLabel titleLabel = new JLabel("Title");
     JLabel artistLabel = new JLabel("Artist");
     JLabel albumLabel = new JLabel("Album");
-    JLabel timeLabel = new JLabel("0:0");
+    JLabel timeLabel = new JLabel("");
 
     // Textfield for search box
     JLabel artistname = new JLabel();
