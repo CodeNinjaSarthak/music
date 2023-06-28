@@ -58,6 +58,10 @@ class GUI extends JFrame implements ActionListener {
 
     private AdvancedPlayer player;
     private String selectedsong;
+    private int currentsong;
+    private int totalsong;
+    private String next_song;
+    private String previous_song;
     private String artist;
     private String album;
     private String genre;
@@ -267,6 +271,7 @@ class GUI extends JFrame implements ActionListener {
             while (rs.next()) {
                 String songname = rs.getString("title");
                 listmodel.addElement(songname);
+                totalsong++;
             }
 
             rs.close();
@@ -289,6 +294,16 @@ class GUI extends JFrame implements ActionListener {
                     selectedsong = song_name.getSelectedValue();
                     System.out.println(selectedsong);
                     extracting_details(selectedsong);
+
+                    // -->
+                    int selectedIndex = song_name.getSelectedIndex();
+                    if (selectedIndex < song_name.getModel().getSize() - 1) {
+                        next_song = song_name.getModel().getElementAt(selectedIndex + 1);
+                    }
+                    if (selectedIndex > 0) {
+                        previous_song = song_name.getModel().getElementAt(selectedIndex - 1);
+                    }
+                    // <--
                 }
             }
         });
@@ -375,9 +390,11 @@ class GUI extends JFrame implements ActionListener {
                 genre = rs.getString("genre");
                 year = rs.getInt("year");
                 audioPath = rs.getString("file");
+                currentsong = rs.getInt("index_number");
                 artistname.setText(artist);
                 albumname.setText(album);
                 songdisplay.setText(selectedsong);
+                System.out.println((currentsong));
             }
 
             rs.close();
@@ -392,7 +409,7 @@ class GUI extends JFrame implements ActionListener {
         if (ae.getSource() == upload) {
             upload_button u = new upload_button();
             u.setVisible(true);
-            u.setSize(300, 400);
+            u.setSize(500, 500);
         }
         if (ae.getSource() == playButton && selectedsong != null) {
             System.out.println("Playbutton working properly");
@@ -401,7 +418,16 @@ class GUI extends JFrame implements ActionListener {
             play(audioPath);
         }
         if (ae.getSource() == nextButton) {
-            System.out.println("The button is working properly");
+            selectedsong = next_song;
+            extracting_details(selectedsong);
+            System.out.println(selectedsong);
+            play(audioPath);
+        }
+        if (ae.getSource() == prevButton) {
+            selectedsong = previous_song;
+            extracting_details(selectedsong);
+            System.out.println(selectedsong);
+            play(audioPath);
         }
         if (ae.getSource() == pauseButton) {
             paused = true;
