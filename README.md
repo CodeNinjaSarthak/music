@@ -83,5 +83,6 @@ The Music App provides the following features:
     }
 ```
 
-##Contributing
+## Contributing
+
 Contributions to the Music App are welcome! If you find any bugs or want to add new features, please submit an issue or a pull request.
