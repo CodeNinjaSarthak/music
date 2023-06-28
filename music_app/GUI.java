@@ -394,7 +394,7 @@ class GUI extends JFrame implements ActionListener {
             u.setVisible(true);
             u.setSize(300, 400);
         }
-        if (ae.getSource() == playButton) {
+        if (ae.getSource() == playButton && selectedsong != null) {
             System.out.println("Playbutton working properly");
             extracting_details(selectedsong);
             System.out.println("audioPath: " + audioPath);
@@ -407,8 +407,9 @@ class GUI extends JFrame implements ActionListener {
             paused = true;
             pause();
         }
-        if (ae.getSource() == resumeButton) {
+        if (ae.getSource() == resumeButton && paused) {
             resume();
+            paused = false;
         }
         if (ae.getSource() == addSongButton) {
             // String selectedSong = song_name.getSelectedValue();
